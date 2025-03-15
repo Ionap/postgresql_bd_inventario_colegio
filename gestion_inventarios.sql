@@ -5,7 +5,7 @@
 -- Dumped from database version 16.8
 -- Dumped by pg_dump version 17.2
 
--- Started on 2025-03-07 21:29:07
+-- Started on 2025-03-14 21:06:58
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -30,7 +30,7 @@ CREATE SCHEMA "Iona Duarte";
 ALTER SCHEMA "Iona Duarte" OWNER TO "Comfe_owner";
 
 --
--- TOC entry 3607 (class 0 OID 0)
+-- TOC entry 3653 (class 0 OID 0)
 -- Dependencies: 6
 -- Name: SCHEMA "Iona Duarte"; Type: COMMENT; Schema: -; Owner: Comfe_owner
 --
@@ -38,6 +38,39 @@ ALTER SCHEMA "Iona Duarte" OWNER TO "Comfe_owner";
 COMMENT ON SCHEMA "Iona Duarte" IS 'BBDD Gestión Inventario Colegio Privado.
 ';
 
+
+--
+-- TOC entry 359 (class 1255 OID 1916933)
+-- Name: registrar_compra(integer, jsonb); Type: PROCEDURE; Schema: Iona Duarte; Owner: Comfe_owner
+--
+
+CREATE PROCEDURE "Iona Duarte".registrar_compra(IN p_id_proveedor integer, IN p_productos jsonb)
+    LANGUAGE plpgsql
+    AS $$
+DECLARE
+    v_id_compra INT;
+    item JSONB;
+BEGIN
+ raise notice 'aqui-1';
+    -- Insertar una nueva compra
+    INSERT INTO "Iona Duarte".compras (fecha, id_proveedor)
+    VALUES (NOW(), p_id_proveedor)
+    RETURNING id_compra INTO v_id_compra;
+    raise notice 'aqui';
+    -- Insertar los productos en la compra
+    FOR item IN SELECT * FROM jsonb_array_elements(p_productos) LOOP
+        INSERT INTO "Iona Duarte".detalles_compras (id_compra, id_producto, cantidad, precio_unitario)
+        VALUES (v_id_compra, 
+                (item->>'id_producto')::INT, 
+                (item->>'cantidad')::INT, 
+                (item->>'precio_unitario')::NUMERIC);
+    END LOOP;
+	 raise notice 'aqui-3';
+END;
+$$;
+
+
+ALTER PROCEDURE "Iona Duarte".registrar_compra(IN p_id_proveedor integer, IN p_productos jsonb) OWNER TO "Comfe_owner";
 
 SET default_tablespace = '';
 
@@ -59,7 +92,7 @@ CREATE TABLE "Iona Duarte".areas_colegio (
 ALTER TABLE "Iona Duarte".areas_colegio OWNER TO "Comfe_owner";
 
 --
--- TOC entry 3608 (class 0 OID 0)
+-- TOC entry 3654 (class 0 OID 0)
 -- Dependencies: 248
 -- Name: TABLE areas_colegio; Type: COMMENT; Schema: Iona Duarte; Owner: Comfe_owner
 --
@@ -86,7 +119,7 @@ CREATE SEQUENCE "Iona Duarte".areas_colegio_id_area_seq
 ALTER SEQUENCE "Iona Duarte".areas_colegio_id_area_seq OWNER TO "Comfe_owner";
 
 --
--- TOC entry 3609 (class 0 OID 0)
+-- TOC entry 3655 (class 0 OID 0)
 -- Dependencies: 247
 -- Name: areas_colegio_id_area_seq; Type: SEQUENCE OWNED BY; Schema: Iona Duarte; Owner: Comfe_owner
 --
@@ -109,7 +142,7 @@ CREATE TABLE "Iona Duarte".categorias (
 ALTER TABLE "Iona Duarte".categorias OWNER TO "Comfe_owner";
 
 --
--- TOC entry 3610 (class 0 OID 0)
+-- TOC entry 3656 (class 0 OID 0)
 -- Dependencies: 242
 -- Name: TABLE categorias; Type: COMMENT; Schema: Iona Duarte; Owner: Comfe_owner
 --
@@ -135,7 +168,7 @@ CREATE SEQUENCE "Iona Duarte".categorias_id_categoria_seq
 ALTER SEQUENCE "Iona Duarte".categorias_id_categoria_seq OWNER TO "Comfe_owner";
 
 --
--- TOC entry 3611 (class 0 OID 0)
+-- TOC entry 3657 (class 0 OID 0)
 -- Dependencies: 241
 -- Name: categorias_id_categoria_seq; Type: SEQUENCE OWNED BY; Schema: Iona Duarte; Owner: Comfe_owner
 --
@@ -159,7 +192,7 @@ CREATE TABLE "Iona Duarte".compras (
 ALTER TABLE "Iona Duarte".compras OWNER TO "Comfe_owner";
 
 --
--- TOC entry 3612 (class 0 OID 0)
+-- TOC entry 3658 (class 0 OID 0)
 -- Dependencies: 250
 -- Name: TABLE compras; Type: COMMENT; Schema: Iona Duarte; Owner: Comfe_owner
 --
@@ -187,7 +220,7 @@ CREATE SEQUENCE "Iona Duarte".compras_id_compra_seq
 ALTER SEQUENCE "Iona Duarte".compras_id_compra_seq OWNER TO "Comfe_owner";
 
 --
--- TOC entry 3613 (class 0 OID 0)
+-- TOC entry 3659 (class 0 OID 0)
 -- Dependencies: 249
 -- Name: compras_id_compra_seq; Type: SEQUENCE OWNED BY; Schema: Iona Duarte; Owner: Comfe_owner
 --
@@ -212,7 +245,7 @@ CREATE TABLE "Iona Duarte".detalles_compras (
 ALTER TABLE "Iona Duarte".detalles_compras OWNER TO "Comfe_owner";
 
 --
--- TOC entry 3614 (class 0 OID 0)
+-- TOC entry 3660 (class 0 OID 0)
 -- Dependencies: 252
 -- Name: TABLE detalles_compras; Type: COMMENT; Schema: Iona Duarte; Owner: Comfe_owner
 --
@@ -240,7 +273,7 @@ CREATE SEQUENCE "Iona Duarte".detalles_compras_id_detalle_seq
 ALTER SEQUENCE "Iona Duarte".detalles_compras_id_detalle_seq OWNER TO "Comfe_owner";
 
 --
--- TOC entry 3615 (class 0 OID 0)
+-- TOC entry 3661 (class 0 OID 0)
 -- Dependencies: 251
 -- Name: detalles_compras_id_detalle_seq; Type: SEQUENCE OWNED BY; Schema: Iona Duarte; Owner: Comfe_owner
 --
@@ -264,7 +297,7 @@ CREATE TABLE "Iona Duarte".detalles_salidas (
 ALTER TABLE "Iona Duarte".detalles_salidas OWNER TO "Comfe_owner";
 
 --
--- TOC entry 3616 (class 0 OID 0)
+-- TOC entry 3662 (class 0 OID 0)
 -- Dependencies: 256
 -- Name: TABLE detalles_salidas; Type: COMMENT; Schema: Iona Duarte; Owner: Comfe_owner
 --
@@ -292,7 +325,7 @@ CREATE SEQUENCE "Iona Duarte".detalles_salidas_id_detalle_seq
 ALTER SEQUENCE "Iona Duarte".detalles_salidas_id_detalle_seq OWNER TO "Comfe_owner";
 
 --
--- TOC entry 3617 (class 0 OID 0)
+-- TOC entry 3663 (class 0 OID 0)
 -- Dependencies: 255
 -- Name: detalles_salidas_id_detalle_seq; Type: SEQUENCE OWNED BY; Schema: Iona Duarte; Owner: Comfe_owner
 --
@@ -318,7 +351,7 @@ CREATE TABLE "Iona Duarte".productos (
 ALTER TABLE "Iona Duarte".productos OWNER TO "Comfe_owner";
 
 --
--- TOC entry 3618 (class 0 OID 0)
+-- TOC entry 3664 (class 0 OID 0)
 -- Dependencies: 244
 -- Name: TABLE productos; Type: COMMENT; Schema: Iona Duarte; Owner: Comfe_owner
 --
@@ -346,7 +379,7 @@ CREATE SEQUENCE "Iona Duarte".productos_id_producto_seq
 ALTER SEQUENCE "Iona Duarte".productos_id_producto_seq OWNER TO "Comfe_owner";
 
 --
--- TOC entry 3619 (class 0 OID 0)
+-- TOC entry 3665 (class 0 OID 0)
 -- Dependencies: 243
 -- Name: productos_id_producto_seq; Type: SEQUENCE OWNED BY; Schema: Iona Duarte; Owner: Comfe_owner
 --
@@ -372,7 +405,7 @@ CREATE TABLE "Iona Duarte".proveedores (
 ALTER TABLE "Iona Duarte".proveedores OWNER TO "Comfe_owner";
 
 --
--- TOC entry 3620 (class 0 OID 0)
+-- TOC entry 3666 (class 0 OID 0)
 -- Dependencies: 246
 -- Name: TABLE proveedores; Type: COMMENT; Schema: Iona Duarte; Owner: Comfe_owner
 --
@@ -399,7 +432,7 @@ CREATE SEQUENCE "Iona Duarte".proveedores_id_proveedor_seq
 ALTER SEQUENCE "Iona Duarte".proveedores_id_proveedor_seq OWNER TO "Comfe_owner";
 
 --
--- TOC entry 3621 (class 0 OID 0)
+-- TOC entry 3667 (class 0 OID 0)
 -- Dependencies: 245
 -- Name: proveedores_id_proveedor_seq; Type: SEQUENCE OWNED BY; Schema: Iona Duarte; Owner: Comfe_owner
 --
@@ -408,7 +441,7 @@ ALTER SEQUENCE "Iona Duarte".proveedores_id_proveedor_seq OWNED BY "Iona Duarte"
 
 
 --
--- TOC entry 320 (class 1259 OID 1794130)
+-- TOC entry 309 (class 1259 OID 1794130)
 -- Name: responsable; Type: TABLE; Schema: Iona Duarte; Owner: Comfe_owner
 --
 
@@ -423,7 +456,7 @@ CREATE TABLE "Iona Duarte".responsable (
 ALTER TABLE "Iona Duarte".responsable OWNER TO "Comfe_owner";
 
 --
--- TOC entry 319 (class 1259 OID 1794129)
+-- TOC entry 308 (class 1259 OID 1794129)
 -- Name: responsable_id_responsable_seq; Type: SEQUENCE; Schema: Iona Duarte; Owner: Comfe_owner
 --
 
@@ -439,8 +472,8 @@ CREATE SEQUENCE "Iona Duarte".responsable_id_responsable_seq
 ALTER SEQUENCE "Iona Duarte".responsable_id_responsable_seq OWNER TO "Comfe_owner";
 
 --
--- TOC entry 3622 (class 0 OID 0)
--- Dependencies: 319
+-- TOC entry 3668 (class 0 OID 0)
+-- Dependencies: 308
 -- Name: responsable_id_responsable_seq; Type: SEQUENCE OWNED BY; Schema: Iona Duarte; Owner: Comfe_owner
 --
 
@@ -463,7 +496,7 @@ CREATE TABLE "Iona Duarte".salidas_inventario (
 ALTER TABLE "Iona Duarte".salidas_inventario OWNER TO "Comfe_owner";
 
 --
--- TOC entry 3623 (class 0 OID 0)
+-- TOC entry 3669 (class 0 OID 0)
 -- Dependencies: 254
 -- Name: TABLE salidas_inventario; Type: COMMENT; Schema: Iona Duarte; Owner: Comfe_owner
 --
@@ -491,7 +524,7 @@ CREATE SEQUENCE "Iona Duarte".salidas_inventario_id_salida_seq
 ALTER SEQUENCE "Iona Duarte".salidas_inventario_id_salida_seq OWNER TO "Comfe_owner";
 
 --
--- TOC entry 3624 (class 0 OID 0)
+-- TOC entry 3670 (class 0 OID 0)
 -- Dependencies: 253
 -- Name: salidas_inventario_id_salida_seq; Type: SEQUENCE OWNED BY; Schema: Iona Duarte; Owner: Comfe_owner
 --
@@ -500,7 +533,7 @@ ALTER SEQUENCE "Iona Duarte".salidas_inventario_id_salida_seq OWNED BY "Iona Dua
 
 
 --
--- TOC entry 322 (class 1259 OID 1794172)
+-- TOC entry 311 (class 1259 OID 1794172)
 -- Name: vista_inventario; Type: VIEW; Schema: Iona Duarte; Owner: Comfe_owner
 --
 
@@ -526,8 +559,8 @@ CREATE VIEW "Iona Duarte".vista_inventario AS
 ALTER VIEW "Iona Duarte".vista_inventario OWNER TO "Comfe_owner";
 
 --
--- TOC entry 3625 (class 0 OID 0)
--- Dependencies: 322
+-- TOC entry 3671 (class 0 OID 0)
+-- Dependencies: 311
 -- Name: VIEW vista_inventario; Type: COMMENT; Schema: Iona Duarte; Owner: Comfe_owner
 --
 
@@ -535,7 +568,7 @@ COMMENT ON VIEW "Iona Duarte".vista_inventario IS 'La vista Vista_Inventario fac
 
 
 --
--- TOC entry 3404 (class 2604 OID 1638443)
+-- TOC entry 3442 (class 2604 OID 1638443)
 -- Name: areas_colegio id_area; Type: DEFAULT; Schema: Iona Duarte; Owner: Comfe_owner
 --
 
@@ -543,7 +576,7 @@ ALTER TABLE ONLY "Iona Duarte".areas_colegio ALTER COLUMN id_area SET DEFAULT ne
 
 
 --
--- TOC entry 3401 (class 2604 OID 1638404)
+-- TOC entry 3439 (class 2604 OID 1638404)
 -- Name: categorias id_categoria; Type: DEFAULT; Schema: Iona Duarte; Owner: Comfe_owner
 --
 
@@ -551,7 +584,7 @@ ALTER TABLE ONLY "Iona Duarte".categorias ALTER COLUMN id_categoria SET DEFAULT 
 
 
 --
--- TOC entry 3405 (class 2604 OID 1638450)
+-- TOC entry 3443 (class 2604 OID 1638450)
 -- Name: compras id_compra; Type: DEFAULT; Schema: Iona Duarte; Owner: Comfe_owner
 --
 
@@ -559,7 +592,7 @@ ALTER TABLE ONLY "Iona Duarte".compras ALTER COLUMN id_compra SET DEFAULT nextva
 
 
 --
--- TOC entry 3406 (class 2604 OID 1638462)
+-- TOC entry 3444 (class 2604 OID 1638462)
 -- Name: detalles_compras id_detalle; Type: DEFAULT; Schema: Iona Duarte; Owner: Comfe_owner
 --
 
@@ -567,7 +600,7 @@ ALTER TABLE ONLY "Iona Duarte".detalles_compras ALTER COLUMN id_detalle SET DEFA
 
 
 --
--- TOC entry 3408 (class 2604 OID 1638491)
+-- TOC entry 3446 (class 2604 OID 1638491)
 -- Name: detalles_salidas id_detalle; Type: DEFAULT; Schema: Iona Duarte; Owner: Comfe_owner
 --
 
@@ -575,7 +608,7 @@ ALTER TABLE ONLY "Iona Duarte".detalles_salidas ALTER COLUMN id_detalle SET DEFA
 
 
 --
--- TOC entry 3402 (class 2604 OID 1638422)
+-- TOC entry 3440 (class 2604 OID 1638422)
 -- Name: productos id_producto; Type: DEFAULT; Schema: Iona Duarte; Owner: Comfe_owner
 --
 
@@ -583,7 +616,7 @@ ALTER TABLE ONLY "Iona Duarte".productos ALTER COLUMN id_producto SET DEFAULT ne
 
 
 --
--- TOC entry 3403 (class 2604 OID 1638436)
+-- TOC entry 3441 (class 2604 OID 1638436)
 -- Name: proveedores id_proveedor; Type: DEFAULT; Schema: Iona Duarte; Owner: Comfe_owner
 --
 
@@ -591,7 +624,7 @@ ALTER TABLE ONLY "Iona Duarte".proveedores ALTER COLUMN id_proveedor SET DEFAULT
 
 
 --
--- TOC entry 3409 (class 2604 OID 1794133)
+-- TOC entry 3447 (class 2604 OID 1794133)
 -- Name: responsable id_responsable; Type: DEFAULT; Schema: Iona Duarte; Owner: Comfe_owner
 --
 
@@ -599,7 +632,7 @@ ALTER TABLE ONLY "Iona Duarte".responsable ALTER COLUMN id_responsable SET DEFAU
 
 
 --
--- TOC entry 3407 (class 2604 OID 1638479)
+-- TOC entry 3445 (class 2604 OID 1638479)
 -- Name: salidas_inventario id_salida; Type: DEFAULT; Schema: Iona Duarte; Owner: Comfe_owner
 --
 
@@ -607,139 +640,133 @@ ALTER TABLE ONLY "Iona Duarte".salidas_inventario ALTER COLUMN id_salida SET DEF
 
 
 --
--- TOC entry 3591 (class 0 OID 1638440)
+-- TOC entry 3637 (class 0 OID 1638440)
 -- Dependencies: 248
 -- Data for Name: areas_colegio; Type: TABLE DATA; Schema: Iona Duarte; Owner: Comfe_owner
 --
 
-COPY "Iona Duarte".areas_colegio (id_area, nombre, responsable, id_responsable) FROM stdin;
-1	Biblioteca	María López	1
-2	Laboratorio de Computación	José Martínez	2
-3	Administración	Laura Fernández	3
-4	Aula de Clases	Pedro Ramírez	4
-\.
+INSERT INTO "Iona Duarte".areas_colegio (id_area, nombre, responsable, id_responsable) VALUES (1, 'Biblioteca', 'María López', 1);
+INSERT INTO "Iona Duarte".areas_colegio (id_area, nombre, responsable, id_responsable) VALUES (2, 'Laboratorio de Computación', 'José Martínez', 2);
+INSERT INTO "Iona Duarte".areas_colegio (id_area, nombre, responsable, id_responsable) VALUES (3, 'Administración', 'Laura Fernández', 3);
+INSERT INTO "Iona Duarte".areas_colegio (id_area, nombre, responsable, id_responsable) VALUES (4, 'Aula de Clases', 'Pedro Ramírez', 4);
 
 
 --
--- TOC entry 3585 (class 0 OID 1638401)
+-- TOC entry 3631 (class 0 OID 1638401)
 -- Dependencies: 242
 -- Data for Name: categorias; Type: TABLE DATA; Schema: Iona Duarte; Owner: Comfe_owner
 --
 
-COPY "Iona Duarte".categorias (id_categoria, nombre, descripcion) FROM stdin;
-1	Útiles Escolares	Material de papelería y útiles escolares
-2	Libros	Libros de texto y literatura
-3	Equipos Tecnológicos	Computadoras, proyectores y equipos electrónicos
-4	Mobiliario	Mesas, sillas y muebles escolares
-\.
+INSERT INTO "Iona Duarte".categorias (id_categoria, nombre, descripcion) VALUES (1, 'Útiles Escolares', 'Material de papelería y útiles escolares');
+INSERT INTO "Iona Duarte".categorias (id_categoria, nombre, descripcion) VALUES (2, 'Libros', 'Libros de texto y literatura');
+INSERT INTO "Iona Duarte".categorias (id_categoria, nombre, descripcion) VALUES (3, 'Equipos Tecnológicos', 'Computadoras, proyectores y equipos electrónicos');
+INSERT INTO "Iona Duarte".categorias (id_categoria, nombre, descripcion) VALUES (4, 'Mobiliario', 'Mesas, sillas y muebles escolares');
 
 
 --
--- TOC entry 3593 (class 0 OID 1638447)
+-- TOC entry 3639 (class 0 OID 1638447)
 -- Dependencies: 250
 -- Data for Name: compras; Type: TABLE DATA; Schema: Iona Duarte; Owner: Comfe_owner
 --
 
-COPY "Iona Duarte".compras (id_compra, fecha, id_proveedor, total) FROM stdin;
-1	2024-01-01	1	500.00
-2	2024-02-01	2	1000.00
-3	2024-03-01	3	1500.00
-7	2025-02-27	3	2500.00
-\.
+INSERT INTO "Iona Duarte".compras (id_compra, fecha, id_proveedor, total) VALUES (1, '2024-01-01', 1, 500.00);
+INSERT INTO "Iona Duarte".compras (id_compra, fecha, id_proveedor, total) VALUES (2, '2024-02-01', 2, 1000.00);
+INSERT INTO "Iona Duarte".compras (id_compra, fecha, id_proveedor, total) VALUES (3, '2024-03-01', 3, 1500.00);
+INSERT INTO "Iona Duarte".compras (id_compra, fecha, id_proveedor, total) VALUES (7, '2025-02-27', 3, 2500.00);
+INSERT INTO "Iona Duarte".compras (id_compra, fecha, id_proveedor, total) VALUES (12, '2025-03-15', 1, NULL);
+INSERT INTO "Iona Duarte".compras (id_compra, fecha, id_proveedor, total) VALUES (13, '2025-03-15', 1, NULL);
+INSERT INTO "Iona Duarte".compras (id_compra, fecha, id_proveedor, total) VALUES (15, '2025-03-15', 1, NULL);
+INSERT INTO "Iona Duarte".compras (id_compra, fecha, id_proveedor, total) VALUES (17, '2025-03-15', 1, NULL);
 
 
 --
--- TOC entry 3595 (class 0 OID 1638459)
+-- TOC entry 3641 (class 0 OID 1638459)
 -- Dependencies: 252
 -- Data for Name: detalles_compras; Type: TABLE DATA; Schema: Iona Duarte; Owner: Comfe_owner
 --
 
-COPY "Iona Duarte".detalles_compras (id_detalle, id_compra, id_producto, cantidad, precio_unitario) FROM stdin;
-1	1	1	100	0.50
-2	1	2	50	2.00
-3	2	3	30	20.00
-4	3	4	5	800.00
-5	1	1	100	0.50
-6	1	2	50	2.00
-7	2	3	30	20.00
-8	3	4	5	800.00
-13	7	4	5	800.00
-14	7	5	2	500.00
-\.
+INSERT INTO "Iona Duarte".detalles_compras (id_detalle, id_compra, id_producto, cantidad, precio_unitario) VALUES (1, 1, 1, 100, 0.50);
+INSERT INTO "Iona Duarte".detalles_compras (id_detalle, id_compra, id_producto, cantidad, precio_unitario) VALUES (2, 1, 2, 50, 2.00);
+INSERT INTO "Iona Duarte".detalles_compras (id_detalle, id_compra, id_producto, cantidad, precio_unitario) VALUES (3, 2, 3, 30, 20.00);
+INSERT INTO "Iona Duarte".detalles_compras (id_detalle, id_compra, id_producto, cantidad, precio_unitario) VALUES (4, 3, 4, 5, 800.00);
+INSERT INTO "Iona Duarte".detalles_compras (id_detalle, id_compra, id_producto, cantidad, precio_unitario) VALUES (5, 1, 1, 100, 0.50);
+INSERT INTO "Iona Duarte".detalles_compras (id_detalle, id_compra, id_producto, cantidad, precio_unitario) VALUES (6, 1, 2, 50, 2.00);
+INSERT INTO "Iona Duarte".detalles_compras (id_detalle, id_compra, id_producto, cantidad, precio_unitario) VALUES (7, 2, 3, 30, 20.00);
+INSERT INTO "Iona Duarte".detalles_compras (id_detalle, id_compra, id_producto, cantidad, precio_unitario) VALUES (8, 3, 4, 5, 800.00);
+INSERT INTO "Iona Duarte".detalles_compras (id_detalle, id_compra, id_producto, cantidad, precio_unitario) VALUES (13, 7, 4, 5, 800.00);
+INSERT INTO "Iona Duarte".detalles_compras (id_detalle, id_compra, id_producto, cantidad, precio_unitario) VALUES (14, 7, 5, 2, 500.00);
+INSERT INTO "Iona Duarte".detalles_compras (id_detalle, id_compra, id_producto, cantidad, precio_unitario) VALUES (23, 12, 3, 10, 1500.00);
+INSERT INTO "Iona Duarte".detalles_compras (id_detalle, id_compra, id_producto, cantidad, precio_unitario) VALUES (24, 12, 5, 5, 3200.00);
+INSERT INTO "Iona Duarte".detalles_compras (id_detalle, id_compra, id_producto, cantidad, precio_unitario) VALUES (25, 13, 3, 50, 1500.00);
+INSERT INTO "Iona Duarte".detalles_compras (id_detalle, id_compra, id_producto, cantidad, precio_unitario) VALUES (26, 13, 5, 15, 3200.00);
+INSERT INTO "Iona Duarte".detalles_compras (id_detalle, id_compra, id_producto, cantidad, precio_unitario) VALUES (29, 15, 3, 50, 1500.00);
+INSERT INTO "Iona Duarte".detalles_compras (id_detalle, id_compra, id_producto, cantidad, precio_unitario) VALUES (30, 15, 4, 15, 3200.00);
+INSERT INTO "Iona Duarte".detalles_compras (id_detalle, id_compra, id_producto, cantidad, precio_unitario) VALUES (33, 17, 3, 50, 1500.00);
+INSERT INTO "Iona Duarte".detalles_compras (id_detalle, id_compra, id_producto, cantidad, precio_unitario) VALUES (34, 17, 5, 15, 3200.00);
 
 
 --
--- TOC entry 3599 (class 0 OID 1638488)
+-- TOC entry 3645 (class 0 OID 1638488)
 -- Dependencies: 256
 -- Data for Name: detalles_salidas; Type: TABLE DATA; Schema: Iona Duarte; Owner: Comfe_owner
 --
 
-COPY "Iona Duarte".detalles_salidas (id_detalle, id_salida, id_producto, cantidad) FROM stdin;
-1	1	1	20
-2	1	2	10
-3	2	4	2
-4	4	4	5
-5	4	5	2
-\.
+INSERT INTO "Iona Duarte".detalles_salidas (id_detalle, id_salida, id_producto, cantidad) VALUES (1, 1, 1, 20);
+INSERT INTO "Iona Duarte".detalles_salidas (id_detalle, id_salida, id_producto, cantidad) VALUES (2, 1, 2, 10);
+INSERT INTO "Iona Duarte".detalles_salidas (id_detalle, id_salida, id_producto, cantidad) VALUES (3, 2, 4, 2);
+INSERT INTO "Iona Duarte".detalles_salidas (id_detalle, id_salida, id_producto, cantidad) VALUES (4, 4, 4, 5);
+INSERT INTO "Iona Duarte".detalles_salidas (id_detalle, id_salida, id_producto, cantidad) VALUES (5, 4, 5, 2);
 
 
 --
--- TOC entry 3587 (class 0 OID 1638419)
+-- TOC entry 3633 (class 0 OID 1638419)
 -- Dependencies: 244
 -- Data for Name: productos; Type: TABLE DATA; Schema: Iona Duarte; Owner: Comfe_owner
 --
 
-COPY "Iona Duarte".productos (id_producto, nombre, descripcion, precio, stock, id_categoria) FROM stdin;
-1	Lápiz	Lápiz de grafito HB	0.50	500	1
-2	Cuaderno	Cuaderno de 100 hojas	2.00	300	1
-3	Libro de Matemáticas	Libro de álgebra para secundaria	20.00	100	2
-4	Computadora	Laptop para docentes	800.00	20	3
-5	Silla Escolar	Silla con escritorio adjunto	50.00	50	4
-\.
+INSERT INTO "Iona Duarte".productos (id_producto, nombre, descripcion, precio, stock, id_categoria) VALUES (1, 'Lápiz', 'Lápiz de grafito HB', 0.50, 500, 1);
+INSERT INTO "Iona Duarte".productos (id_producto, nombre, descripcion, precio, stock, id_categoria) VALUES (2, 'Cuaderno', 'Cuaderno de 100 hojas', 2.00, 300, 1);
+INSERT INTO "Iona Duarte".productos (id_producto, nombre, descripcion, precio, stock, id_categoria) VALUES (3, 'Libro de Matemáticas', 'Libro de álgebra para secundaria', 20.00, 100, 2);
+INSERT INTO "Iona Duarte".productos (id_producto, nombre, descripcion, precio, stock, id_categoria) VALUES (4, 'Computadora', 'Laptop para docentes', 800.00, 20, 3);
+INSERT INTO "Iona Duarte".productos (id_producto, nombre, descripcion, precio, stock, id_categoria) VALUES (5, 'Silla Escolar', 'Silla con escritorio adjunto', 50.00, 50, 4);
 
 
 --
--- TOC entry 3589 (class 0 OID 1638433)
+-- TOC entry 3635 (class 0 OID 1638433)
 -- Dependencies: 246
 -- Data for Name: proveedores; Type: TABLE DATA; Schema: Iona Duarte; Owner: Comfe_owner
 --
 
-COPY "Iona Duarte".proveedores (id_proveedor, nombre, contacto, telefono, email, direccion) FROM stdin;
-1	Distribuidora Escolar	Juan Pérez	555-1111	contacto@distescolar.com	\N
-2	Librería Central	Ana Gómez	555-2222	ventas@libreriacentral.com	\N
-3	TecnoEdu	Carlos Rivas	555-3333	info@tecnoedu.com	\N
-\.
+INSERT INTO "Iona Duarte".proveedores (id_proveedor, nombre, contacto, telefono, email, direccion) VALUES (1, 'Distribuidora Escolar', 'Juan Pérez', '555-1111', 'contacto@distescolar.com', NULL);
+INSERT INTO "Iona Duarte".proveedores (id_proveedor, nombre, contacto, telefono, email, direccion) VALUES (2, 'Librería Central', 'Ana Gómez', '555-2222', 'ventas@libreriacentral.com', NULL);
+INSERT INTO "Iona Duarte".proveedores (id_proveedor, nombre, contacto, telefono, email, direccion) VALUES (3, 'TecnoEdu', 'Carlos Rivas', '555-3333', 'info@tecnoedu.com', NULL);
 
 
 --
--- TOC entry 3601 (class 0 OID 1794130)
--- Dependencies: 320
+-- TOC entry 3647 (class 0 OID 1794130)
+-- Dependencies: 309
 -- Data for Name: responsable; Type: TABLE DATA; Schema: Iona Duarte; Owner: Comfe_owner
 --
 
-COPY "Iona Duarte".responsable (id_responsable, nombre, cargo, contacto) FROM stdin;
-1	María López	Bibliotecaria	mlopez@colegio.edu
-2	José Martínez	Encargado de Laboratorio	jmartinez@colegio.edu
-3	Laura Fernández	Administradora	lfernandez@colegio.edu
-4	Pedro Ramírez	Profesor	pramirez@colegio.edu
-\.
+INSERT INTO "Iona Duarte".responsable (id_responsable, nombre, cargo, contacto) VALUES (1, 'María López', 'Bibliotecaria', 'mlopez@colegio.edu');
+INSERT INTO "Iona Duarte".responsable (id_responsable, nombre, cargo, contacto) VALUES (2, 'José Martínez', 'Encargado de Laboratorio', 'jmartinez@colegio.edu');
+INSERT INTO "Iona Duarte".responsable (id_responsable, nombre, cargo, contacto) VALUES (3, 'Laura Fernández', 'Administradora', 'lfernandez@colegio.edu');
+INSERT INTO "Iona Duarte".responsable (id_responsable, nombre, cargo, contacto) VALUES (4, 'Pedro Ramírez', 'Profesor', 'pramirez@colegio.edu');
 
 
 --
--- TOC entry 3597 (class 0 OID 1638476)
+-- TOC entry 3643 (class 0 OID 1638476)
 -- Dependencies: 254
 -- Data for Name: salidas_inventario; Type: TABLE DATA; Schema: Iona Duarte; Owner: Comfe_owner
 --
 
-COPY "Iona Duarte".salidas_inventario (id_salida, fecha, id_area, id_responsable) FROM stdin;
-1	2024-02-10	1	\N
-2	2024-02-12	2	2
-4	2025-02-27	2	2
-\.
+INSERT INTO "Iona Duarte".salidas_inventario (id_salida, fecha, id_area, id_responsable) VALUES (1, '2024-02-10', 1, NULL);
+INSERT INTO "Iona Duarte".salidas_inventario (id_salida, fecha, id_area, id_responsable) VALUES (2, '2024-02-12', 2, 2);
+INSERT INTO "Iona Duarte".salidas_inventario (id_salida, fecha, id_area, id_responsable) VALUES (4, '2025-02-27', 2, 2);
 
 
 --
--- TOC entry 3626 (class 0 OID 0)
+-- TOC entry 3672 (class 0 OID 0)
 -- Dependencies: 247
 -- Name: areas_colegio_id_area_seq; Type: SEQUENCE SET; Schema: Iona Duarte; Owner: Comfe_owner
 --
@@ -748,7 +775,7 @@ SELECT pg_catalog.setval('"Iona Duarte".areas_colegio_id_area_seq', 4, true);
 
 
 --
--- TOC entry 3627 (class 0 OID 0)
+-- TOC entry 3673 (class 0 OID 0)
 -- Dependencies: 241
 -- Name: categorias_id_categoria_seq; Type: SEQUENCE SET; Schema: Iona Duarte; Owner: Comfe_owner
 --
@@ -757,25 +784,25 @@ SELECT pg_catalog.setval('"Iona Duarte".categorias_id_categoria_seq', 4, true);
 
 
 --
--- TOC entry 3628 (class 0 OID 0)
+-- TOC entry 3674 (class 0 OID 0)
 -- Dependencies: 249
 -- Name: compras_id_compra_seq; Type: SEQUENCE SET; Schema: Iona Duarte; Owner: Comfe_owner
 --
 
-SELECT pg_catalog.setval('"Iona Duarte".compras_id_compra_seq', 7, true);
+SELECT pg_catalog.setval('"Iona Duarte".compras_id_compra_seq', 17, true);
 
 
 --
--- TOC entry 3629 (class 0 OID 0)
+-- TOC entry 3675 (class 0 OID 0)
 -- Dependencies: 251
 -- Name: detalles_compras_id_detalle_seq; Type: SEQUENCE SET; Schema: Iona Duarte; Owner: Comfe_owner
 --
 
-SELECT pg_catalog.setval('"Iona Duarte".detalles_compras_id_detalle_seq', 14, true);
+SELECT pg_catalog.setval('"Iona Duarte".detalles_compras_id_detalle_seq', 34, true);
 
 
 --
--- TOC entry 3630 (class 0 OID 0)
+-- TOC entry 3676 (class 0 OID 0)
 -- Dependencies: 255
 -- Name: detalles_salidas_id_detalle_seq; Type: SEQUENCE SET; Schema: Iona Duarte; Owner: Comfe_owner
 --
@@ -784,7 +811,7 @@ SELECT pg_catalog.setval('"Iona Duarte".detalles_salidas_id_detalle_seq', 5, tru
 
 
 --
--- TOC entry 3631 (class 0 OID 0)
+-- TOC entry 3677 (class 0 OID 0)
 -- Dependencies: 243
 -- Name: productos_id_producto_seq; Type: SEQUENCE SET; Schema: Iona Duarte; Owner: Comfe_owner
 --
@@ -793,7 +820,7 @@ SELECT pg_catalog.setval('"Iona Duarte".productos_id_producto_seq', 5, true);
 
 
 --
--- TOC entry 3632 (class 0 OID 0)
+-- TOC entry 3678 (class 0 OID 0)
 -- Dependencies: 245
 -- Name: proveedores_id_proveedor_seq; Type: SEQUENCE SET; Schema: Iona Duarte; Owner: Comfe_owner
 --
@@ -802,8 +829,8 @@ SELECT pg_catalog.setval('"Iona Duarte".proveedores_id_proveedor_seq', 3, true);
 
 
 --
--- TOC entry 3633 (class 0 OID 0)
--- Dependencies: 319
+-- TOC entry 3679 (class 0 OID 0)
+-- Dependencies: 308
 -- Name: responsable_id_responsable_seq; Type: SEQUENCE SET; Schema: Iona Duarte; Owner: Comfe_owner
 --
 
@@ -811,7 +838,7 @@ SELECT pg_catalog.setval('"Iona Duarte".responsable_id_responsable_seq', 4, true
 
 
 --
--- TOC entry 3634 (class 0 OID 0)
+-- TOC entry 3680 (class 0 OID 0)
 -- Dependencies: 253
 -- Name: salidas_inventario_id_salida_seq; Type: SEQUENCE SET; Schema: Iona Duarte; Owner: Comfe_owner
 --
@@ -820,7 +847,7 @@ SELECT pg_catalog.setval('"Iona Duarte".salidas_inventario_id_salida_seq', 4, tr
 
 
 --
--- TOC entry 3417 (class 2606 OID 1638445)
+-- TOC entry 3455 (class 2606 OID 1638445)
 -- Name: areas_colegio areas_colegio_pkey; Type: CONSTRAINT; Schema: Iona Duarte; Owner: Comfe_owner
 --
 
@@ -829,7 +856,7 @@ ALTER TABLE ONLY "Iona Duarte".areas_colegio
 
 
 --
--- TOC entry 3411 (class 2606 OID 1638408)
+-- TOC entry 3449 (class 2606 OID 1638408)
 -- Name: categorias categorias_pkey; Type: CONSTRAINT; Schema: Iona Duarte; Owner: Comfe_owner
 --
 
@@ -838,7 +865,7 @@ ALTER TABLE ONLY "Iona Duarte".categorias
 
 
 --
--- TOC entry 3419 (class 2606 OID 1638452)
+-- TOC entry 3457 (class 2606 OID 1638452)
 -- Name: compras compras_pkey; Type: CONSTRAINT; Schema: Iona Duarte; Owner: Comfe_owner
 --
 
@@ -847,7 +874,7 @@ ALTER TABLE ONLY "Iona Duarte".compras
 
 
 --
--- TOC entry 3421 (class 2606 OID 1638464)
+-- TOC entry 3459 (class 2606 OID 1638464)
 -- Name: detalles_compras detalles_compras_pkey; Type: CONSTRAINT; Schema: Iona Duarte; Owner: Comfe_owner
 --
 
@@ -856,7 +883,7 @@ ALTER TABLE ONLY "Iona Duarte".detalles_compras
 
 
 --
--- TOC entry 3425 (class 2606 OID 1638493)
+-- TOC entry 3463 (class 2606 OID 1638493)
 -- Name: detalles_salidas detalles_salidas_pkey; Type: CONSTRAINT; Schema: Iona Duarte; Owner: Comfe_owner
 --
 
@@ -865,7 +892,7 @@ ALTER TABLE ONLY "Iona Duarte".detalles_salidas
 
 
 --
--- TOC entry 3413 (class 2606 OID 1638426)
+-- TOC entry 3451 (class 2606 OID 1638426)
 -- Name: productos productos_pkey; Type: CONSTRAINT; Schema: Iona Duarte; Owner: Comfe_owner
 --
 
@@ -874,7 +901,7 @@ ALTER TABLE ONLY "Iona Duarte".productos
 
 
 --
--- TOC entry 3415 (class 2606 OID 1638438)
+-- TOC entry 3453 (class 2606 OID 1638438)
 -- Name: proveedores proveedores_pkey; Type: CONSTRAINT; Schema: Iona Duarte; Owner: Comfe_owner
 --
 
@@ -883,7 +910,7 @@ ALTER TABLE ONLY "Iona Duarte".proveedores
 
 
 --
--- TOC entry 3427 (class 2606 OID 1794135)
+-- TOC entry 3465 (class 2606 OID 1794135)
 -- Name: responsable responsable_pkey; Type: CONSTRAINT; Schema: Iona Duarte; Owner: Comfe_owner
 --
 
@@ -892,7 +919,7 @@ ALTER TABLE ONLY "Iona Duarte".responsable
 
 
 --
--- TOC entry 3423 (class 2606 OID 1638481)
+-- TOC entry 3461 (class 2606 OID 1638481)
 -- Name: salidas_inventario salidas_inventario_pkey; Type: CONSTRAINT; Schema: Iona Duarte; Owner: Comfe_owner
 --
 
@@ -901,7 +928,7 @@ ALTER TABLE ONLY "Iona Duarte".salidas_inventario
 
 
 --
--- TOC entry 3430 (class 2606 OID 1638453)
+-- TOC entry 3468 (class 2606 OID 1638453)
 -- Name: compras compras_id_proveedor_fkey; Type: FK CONSTRAINT; Schema: Iona Duarte; Owner: Comfe_owner
 --
 
@@ -910,7 +937,7 @@ ALTER TABLE ONLY "Iona Duarte".compras
 
 
 --
--- TOC entry 3431 (class 2606 OID 1638465)
+-- TOC entry 3469 (class 2606 OID 1638465)
 -- Name: detalles_compras detalles_compras_id_compra_fkey; Type: FK CONSTRAINT; Schema: Iona Duarte; Owner: Comfe_owner
 --
 
@@ -919,7 +946,7 @@ ALTER TABLE ONLY "Iona Duarte".detalles_compras
 
 
 --
--- TOC entry 3432 (class 2606 OID 1638470)
+-- TOC entry 3470 (class 2606 OID 1638470)
 -- Name: detalles_compras detalles_compras_id_producto_fkey; Type: FK CONSTRAINT; Schema: Iona Duarte; Owner: Comfe_owner
 --
 
@@ -928,7 +955,7 @@ ALTER TABLE ONLY "Iona Duarte".detalles_compras
 
 
 --
--- TOC entry 3435 (class 2606 OID 1638499)
+-- TOC entry 3473 (class 2606 OID 1638499)
 -- Name: detalles_salidas detalles_salidas_id_producto_fkey; Type: FK CONSTRAINT; Schema: Iona Duarte; Owner: Comfe_owner
 --
 
@@ -937,7 +964,7 @@ ALTER TABLE ONLY "Iona Duarte".detalles_salidas
 
 
 --
--- TOC entry 3436 (class 2606 OID 1638494)
+-- TOC entry 3474 (class 2606 OID 1638494)
 -- Name: detalles_salidas detalles_salidas_id_salida_fkey; Type: FK CONSTRAINT; Schema: Iona Duarte; Owner: Comfe_owner
 --
 
@@ -946,7 +973,7 @@ ALTER TABLE ONLY "Iona Duarte".detalles_salidas
 
 
 --
--- TOC entry 3429 (class 2606 OID 1794136)
+-- TOC entry 3467 (class 2606 OID 1794136)
 -- Name: areas_colegio fk_responsable_area; Type: FK CONSTRAINT; Schema: Iona Duarte; Owner: Comfe_owner
 --
 
@@ -955,7 +982,7 @@ ALTER TABLE ONLY "Iona Duarte".areas_colegio
 
 
 --
--- TOC entry 3433 (class 2606 OID 1794161)
+-- TOC entry 3471 (class 2606 OID 1794161)
 -- Name: salidas_inventario fk_responsable_salida; Type: FK CONSTRAINT; Schema: Iona Duarte; Owner: Comfe_owner
 --
 
@@ -964,7 +991,7 @@ ALTER TABLE ONLY "Iona Duarte".salidas_inventario
 
 
 --
--- TOC entry 3428 (class 2606 OID 1638427)
+-- TOC entry 3466 (class 2606 OID 1638427)
 -- Name: productos productos_id_categoria_fkey; Type: FK CONSTRAINT; Schema: Iona Duarte; Owner: Comfe_owner
 --
 
@@ -973,7 +1000,7 @@ ALTER TABLE ONLY "Iona Duarte".productos
 
 
 --
--- TOC entry 3434 (class 2606 OID 1638482)
+-- TOC entry 3472 (class 2606 OID 1638482)
 -- Name: salidas_inventario salidas_inventario_id_area_fkey; Type: FK CONSTRAINT; Schema: Iona Duarte; Owner: Comfe_owner
 --
 
@@ -981,7 +1008,7 @@ ALTER TABLE ONLY "Iona Duarte".salidas_inventario
     ADD CONSTRAINT salidas_inventario_id_area_fkey FOREIGN KEY (id_area) REFERENCES "Iona Duarte".areas_colegio(id_area);
 
 
--- Completed on 2025-03-07 21:29:16
+-- Completed on 2025-03-14 21:07:10
 
 --
 -- PostgreSQL database dump complete
